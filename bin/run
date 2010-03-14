@@ -1,0 +1,10 @@
+#!/bin/sh
+bin=`dirname "$0"`
+APP_HOME=`cd "${bin}"; cd ..; pwd`
+APP_JAR="${APP_HOME}/build/dist/unicoder.jar"
+
+CLASSPATH="${APP_HOME}/src/conf"
+CLASSPATH="${CLASSPATH}:${APP_HOME}/lib/*"
+CLASSPATH="${CLASSPATH}:${APP_JAR}"
+
+java -classpath "${CLASSPATH}" "$@" || exit 1

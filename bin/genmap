@@ -1,0 +1,3 @@
+#!/bin/sh
+bin=`dirname "$0"`
+${bin}/run de.dekstop.unicoder.CompatibilityEquivalence "$@" || exit 1

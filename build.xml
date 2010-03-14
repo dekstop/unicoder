@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project basedir="." default="jar" name="unicoder">
+
+	<property name="version" value="0.1" />
+	
+	<property name="bin.dir" location="bin" />
+	<property name="build.dir" location="build" />
+	<property name="lib.dir" location="lib" />
+	<property name="src.dir" location="src" />
+	<property name="test.dir" location="test" />
+	  
+	<property name="src.conf.dir" location="${src.dir}/conf" />
+	<property name="src.java.dir" location="${src.dir}/java" />
+	
+	<property name="test.conf.dir" location="${test.dir}/conf" />
+	<property name="test.data.dir" location="${test.dir}/data" />
+	<property name="test.java.dir" location="${test.dir}/java" />
+	
+	<property name="build.classes.dir" value="${build.dir}/classes" />
+	<property name="build.dist.dir" value="${build.dir}/dist" />
+	
+	<property name="build.javadoc.dir" location="${build.dir}/javadoc" />
+	<property name="build.javadoc.includes" value="de/dekstop/**/*" />
+	
+	<property name="junit.report.dir" location="${build.dir}/junit" />
+	
+	<property name="jar.file" value="unicoder.jar" />
+	<property name="main.class" value="de.dekstop.unicoder.Launcher" />	
+	<property name="jar.classes.include" value="**/*" />
+	<property name="jar.classes.exclude" value="**/*Test*, fm/last/test/**/*" />
+
+	<path id="compile-classpath">
+		<fileset dir="${lib.dir}">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<path id="test-compile-classpath">
+		<path refid="compile-classpath" />
+	</path>
+
+	<path id="test-classpath">
+		<pathelement location="${test.conf.dir}" />
+		<pathelement location="${build.classes.dir}" />
+		<path refid="compile-classpath" />
+	</path>
+	
+	<target name="init">
+		<mkdir dir="${build.dir}" />
+	</target>
+
+	<target name="clean">
+		<delete dir="${build.dir}" />
+	</target>
+
+	<target name="compile" depends="compile-source" />
+	
+	<target name="compile-source" depends="init">
+		<mkdir dir="${build.classes.dir}" />
+	    <javac srcdir="${src.java.dir}" destdir="${build.classes.dir}" debug="true" fork="true">
+	    	<classpath refid="compile-classpath" />
+	    </javac>
+	</target>
+
+	<target name="compile-test" depends="compile-source">
+		<mkdir dir="${build.classes.dir}" />
+	    <javac srcdir="${test.java.dir}" destdir="${build.classes.dir}" debug="true">
+			<classpath>
+	        	<path refid="test-compile-classpath" />
+	     	</classpath>
+	    </javac>
+	</target>
+
+	<target name="test" depends="compile-test">
+		<delete dir="${junit.report.dir}" />
+	    <mkdir dir="${junit.report.dir}" />
+
+	    <property name="junit.includes" value="**/*Test.java" />
+	    <property name="junit.fork" value="true" />
+	    <property name="junit.forkmode" value="perTest" />
+
+	    <junit printsummary="yes" failureproperty="testfailed" showoutput="true" fork="${junit.fork}" 
+	      forkmode="${junit.forkmode}">
+	   		<classpath refid="test-classpath" />
+
+	      	<formatter type="xml" usefile="true" />
+
+	      	<batchtest todir="${junit.report.dir}">
+	        	<fileset dir="${test.java.dir}" includes="${junit.includes}" excludes="${junit.excludes}" />
+	      	</batchtest>
+
+	    </junit>
+
+	    <junitreport todir="${junit.report.dir}">
+	    	<fileset dir="${junit.report.dir}">
+	        	<include name="TEST-*.xml" />
+	      	</fileset>
+	      	<report format="noframes" todir="${junit.report.dir}" />
+	    </junitreport>
+
+	    <fail if="testfailed" message="Some test(s) failed. See '${junit.report.dir}' for details." />
+	</target>
+
+	<target name="javadoc">
+		<tstamp>
+	      	<format property="YEAR" pattern="yyyy" />
+	    </tstamp>
+	    <javadoc destdir="${build.javadoc.dir}" author="false" version="true" use="true" 
+	    	windowtitle="${ant.project.name} API" 
+	    	classpathref="compile-classpath">
+	      	<fileset dir="${src.java.dir}" defaultexcludes="yes">
+	        	<include name="${javadoc.includes}" />
+	      	</fileset>
+	  </javadoc>
+	</target>
+
+	<target name="jar" depends="compile">
+		<mkdir dir="${build.dist.dir}" />
+		<tstamp>
+			<format property="BUILD-DATETIME" pattern="yyyy-MM-dd HH:mm:ss" />
+		</tstamp>
+		<jar destfile="${build.dist.dir}/${jar.file}" update="true">
+			<fileset dir="${build.classes.dir}" 
+				excludes="${jar.classes.exclude}"
+				includes="${jar.classes.include}" />
+			<manifest>
+				<attribute name="Build-Version" value="${version}" />
+				<attribute name="Build-DateTime" value="${BUILD-DATETIME}" />
+				<attribute name="Main-Class" value="${main.class}"/> 
+				<attribute name="Class-Path" value="${main.class}"/>
+			</manifest>
+		</jar>
+		<echo message="Build-Version set to ${version}" />
+		<echo message="Build-DateTime set to ${BUILD-DATETIME}" />
+		<echo message="Main-Class set to ${main.class}" />
+	</target>
+</project>
+
