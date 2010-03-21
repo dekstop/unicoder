@@ -1,0 +1,18 @@
+#!/usr/bin/env ruby
+if ARGV.size!=1 then
+  puts "<map file>"
+  exit 1
+end
+m = {}
+File.read(ARGV[0]).each_line do |l|
+  k,v = l.chomp.split(/\s*=\s*/)
+  m[k] = v.split(/\s*,\s*/) if v
+end
+STDIN.each_char() do |c|
+  n = m[c]
+  if n.nil? || n.size==0 then
+    print c
+  else
+    print n[rand(n.size)]
+  end
+end
