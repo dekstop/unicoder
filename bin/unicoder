@@ -8,7 +8,7 @@ File.read(ARGV[0]).each_line do |l|
   k,v = l.chomp.split(/\s*=\s*/)
   m[k] = v.split(/\s*,\s*/) if v
 end
-STDIN.each_char do |c|
+STDIN.each_line do |l|
   l.scan(/./u).each do |c|
     n = m[c]
     if n.nil? || n.size==0 then
